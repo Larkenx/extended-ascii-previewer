@@ -5,49 +5,47 @@ let path = require('path')
 let serveStatic = require('serve-static')
 let getImageSize = require('image-size')
 
-let storedTilesets = null
+const relativePath = 'images/tilesets/transparent'
+const tilesetDirectory = path.resolve(__dirname, `../public/${relativePath}`)
+let storedTilesets = []
 
-async function getTilesetsByDimension() {
-	const tilesetDirectory = path.resolve(__dirname, '../src/assets/tilesets/transparent')
+function cacheTilesetsByDimension() {
+	// ASCII IBM CODE PAGE 437 is always 16x16
 	const columns = 16
 	const rows = 16
-	console.log(tilesetDirectory)
-	fs.readdir(tilesetDirectory, (err, files) => {
-		if (err) {
-			storedTilesets = null
-			console.error(err)
-		} else {
-			storedTilesets = []
-			files.forEach(file => {
-				const { width, height } = getImageSize(path.resolve(tilesetDirectory, file))
-				storedTilesets.push({
-					name: file,
-					imageWidth: width,
-					imageHeight: height,
-					spriteWidth: width / columns,
-					spriteHeight: height / rows
-				})
+	try {
+		const files = fs.readdirSync(tilesetDirectory)
+		for (let file of files) {
+			const { width, height } = getImageSize(path.resolve(tilesetDirectory, file))
+			storedTilesets.push({
+				name: file,
+				url: relativePath + `/${file}`,
+				imageWidth: width,
+				imageHeight: height,
+				spriteWidth: width / columns,
+				spriteHeight: height / rows
 			})
 		}
+	} catch (err) {
+		console.error(err)
+		process.exit(1)
+	}
+}
+
+cacheTilesetsByDimension()
+
+let app = express()
+let port = process.env.PORT || 5000
+
+app.use('/', express.static(path.join(__dirname, 'dist')))
+
+app.get('/tilesets', (request, response) => {
+	response.send({
+		tilesetPath: relativePath,
+		tilesets: storedTilesets
 	})
-}
+})
 
-async function cacheTilesets() {
-	let tilesets = await getTilesetsByDimension()
-}
+app.listen(port)
 
-cacheTilesets()
-
-// let app = express()
-
-// app.use('/', express.static(path.join(__dirname, 'dist')))
-
-// app.get('/tilesets', (request, response) => {
-//     response.send({
-
-//     })
-// })
-
-// let port = process.env.PORT || 5000
-// app.listen(port)
-// console.log('Serving extended-ascii-previewer on port: ' + port)
+console.log('Serving extended-ascii-previewer on port: ' + port)
