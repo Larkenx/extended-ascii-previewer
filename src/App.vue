@@ -8,8 +8,16 @@
     </v-toolbar>
     <v-content>
       <v-layout>
-        <v-flex xs6/>
-        <TilesetPicker :tilesets="tilesets"/>
+        <v-flex xs6>
+          <v-layout align-center justify-center fill-height>
+            <v-layout align-center justify-center column>
+              <PixiRenderer :tilesets="tilesets"/>
+            </v-layout>
+          </v-layout>
+        </v-flex>
+        <v-flex xs6>
+          <TilesetPicker :tilesets="tilesets"/>
+        </v-flex>
       </v-layout>
     </v-content>
   </v-app>
@@ -18,10 +26,12 @@
 <script>
 import axios from 'axios'
 import TilesetPicker from './components/TilesetPicker'
+import PixiRenderer from './components/PixiRenderer'
 export default {
 	name: 'App',
 	components: {
-		TilesetPicker
+		TilesetPicker,
+		PixiRenderer
 	},
 	created() {
 		const tilesetApi = window.origin.includes('localhost') ? 'http://localhost:5000' : window.origin

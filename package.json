@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "image-size": "^0.7.2",
+    "pixi.js": "^4.8.7",
     "vue": "^2.6.6",
     "vuetify": "^1.5.5"
   },
