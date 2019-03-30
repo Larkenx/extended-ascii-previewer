@@ -11,7 +11,7 @@
         <v-flex xs6>
           <v-layout align-center justify-center fill-height>
             <v-layout align-center justify-center column>
-              <PixiRenderer :tilesets="tilesets"/>
+              <PixiRenderer :tilesets="tilesets" :selectedTileset="selectedTileset" :map="map"/>
             </v-layout>
           </v-layout>
         </v-flex>
@@ -46,7 +46,9 @@ export default {
 	},
 	data() {
 		return {
-			tilesets: []
+			tilesets: [],
+			selectedTileset: null,
+			map: []
 		}
 	}
 }

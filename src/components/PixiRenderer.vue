@@ -20,11 +20,16 @@ export default {
 		this.mountCanvas()
 	},
 	props: {
-		tilesets: Array
+		tilesets: Array,
+		selectedTileset: Object,
+		map: Array
 	},
 	watch: {
 		tilesets(newState, oldState) {
 			this.loadTilesets()
+		},
+		selectedTileset(newState, oldState) {
+			this.renderMap()
 		}
 	},
 	data() {
@@ -44,8 +49,8 @@ export default {
 					.on('progress', (loader, resource) => this.handleAssetLoad(loader, resource))
 					.load((loader, resources) => {
 						this.clear()
-						console.log('Finished loading tilesets')
 						this.generateTextures()
+						this.renderMap()
 					})
 			}
 		},
@@ -54,7 +59,6 @@ export default {
 		},
 		handleAssetLoad(loader, resource) {
 			let { stage, renderer } = app
-			console.log(resource)
 			this.clear()
 			// let graphics = new PIXI.Graphics()
 			let cx = stage.width / 2
@@ -75,22 +79,36 @@ export default {
 			return [colNumber, rowNumber]
 		},
 		generateTextures() {
-			for (let i = 0; i <= 255; i++) {
-				for (let tileset of this.tilesets.slice(0, 1)) {
-					const { spriteWidth, spriteHeight, name } = tileset
-					console.log(this.getTilesetCoords(i, spriteWidth, spriteHeight, 16))
-					console.log(String.fromCharCode(i))
+			this.textureMap = {}
+			for (let tileset of this.tilesets) {
+				const { spriteWidth, spriteHeight, name } = tileset
+				console.log(`Generating ${name}. ${spriteWidth}x${spriteHeight}`)
+				this.textureMap[name] = {}
+				for (let i = 0; i <= 255; i++) {
+					const character = String.fromCharCode(i)
+					const coords = this.getTilesetCoords(i, spriteWidth, spriteHeight, 16)
+					const frame = new PIXI.Rectangle(coords[0], coords[1], spriteWidth, spriteHeight)
+					const texture = new PIXI.Texture(PIXI.loader.resources[tileset.name].texture, frame)
+					this.textureMap[name][character] = texture
 				}
 			}
 		},
-		renderMap(map) {
-			// I want to load every 32x32 frame from the tileset image
-			// for (let id = 0; id < this.tileset.tilecount; id++) {
-			// 	let coords = this.getTilesetCoords(id)
-			// 	let frame = new PIXI.Rectangle(coords[0], coords[1], this.tileSize, this.tileSize)
-			// 	let texture = new PIXI.Texture(PIXI.loader.resources['spritesheet'].texture, frame)
-			// 	this.tilesetMapping[id] = texture
-			// }
+		renderMap() {
+			this.clear()
+			let background = new PIXI.Container()
+			const { spriteWidth, spriteHeight, name } = this.selectedTileset
+			for (let y = 0; y < this.map.length; y++) {
+				for (let x = 0; x < this.map[0].length; x++) {
+					const character = this.map[y][x]
+					const texture = this.textureMap[character]
+					let sprite = new PIXI.Sprite(texture)
+					sprite.position.set(x * spriteWidth, y * spriteHeight)
+					background.addChild(sprite)
+				}
+			}
+			let staticBackground = new PIXI.Sprite(app.renderer.generateTexture(background))
+			staticBackground.position.set(0, 0)
+			app.stage.addChild(staticBackground)
 		}
 	}
 }
