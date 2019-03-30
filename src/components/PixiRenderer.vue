@@ -1,5 +1,5 @@
 <template>
-  <div id="pixi_canvas"/>
+  <div id="pixi_canvas" />
 </template>
 
 <script>
@@ -7,7 +7,7 @@ import * as PIXI from 'pixi.js'
 
 const app = new PIXI.Application({
 	width: 800,
-	height: 600,
+	height: 400,
 	antialias: true,
 	backgroundColor: 0x474747
 })
@@ -74,7 +74,7 @@ export default {
 			stage.addChild(text)
 		},
 		getTilesetCoords(index, tileWidth, tileHeight, columns) {
-			let rowNumber = Math.floor(index / columns) * tileHeight
+			let rowNumber = Math.floor(index / columns) * tileWidth
 			let colNumber = (index % columns) * tileHeight
 			return [colNumber, rowNumber]
 		},
