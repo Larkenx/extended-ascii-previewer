@@ -16,15 +16,17 @@ function cacheTilesetsByDimension() {
 	try {
 		const files = fs.readdirSync(tilesetDirectory)
 		for (let file of files) {
-			const { width, height } = getImageSize(path.resolve(tilesetDirectory, file))
-			storedTilesets.push({
-				name: file,
-				url: relativePath + `/${file}`,
-				imageWidth: width,
-				imageHeight: height,
-				spriteWidth: width / columns,
-				spriteHeight: height / rows
-			})
+			if (file !== '.DS_Store') {
+				const { width, height } = getImageSize(path.resolve(tilesetDirectory, file))
+				storedTilesets.push({
+					name: file,
+					url: relativePath + `/${file}`,
+					imageWidth: width,
+					imageHeight: height,
+					spriteWidth: width / columns,
+					spriteHeight: height / rows
+				})
+			}
 		}
 	} catch (err) {
 		console.error(err)
