@@ -10,13 +10,14 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "rot-js": "^0.6.5",
     "d3-delaunay": "^4.1.5",
-    "poisson-disk-sampling": "^1.0.2",
-    "prng-parkmiller-js": "^0.1.1",
-    "simplex-noise": "^2.4.0",
+    "express": "^4.16.4",
     "image-size": "^0.7.2",
     "pixi.js": "^4.8.7",
+    "poisson-disk-sampling": "^1.0.2",
+    "prng-parkmiller-js": "^0.1.1",
+    "rot-js": "^0.6.5",
+    "simplex-noise": "^2.4.0",
     "vue": "^2.6.6",
     "vuetify": "^1.5.5",
     "vuex": "^3.1.0"

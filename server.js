@@ -2,7 +2,6 @@ let express = require('express')
 let os = require('os')
 let fs = require('fs')
 let path = require('path')
-let serveStatic = require('serve-static')
 let getImageSize = require('image-size')
 
 const relativePath = 'images/tilesets/transparent'
