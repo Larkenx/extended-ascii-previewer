@@ -7,12 +7,11 @@
       <v-spacer></v-spacer>
     </v-toolbar>
     <v-content>
-      <v-layout>
+      <v-layout fill-height>
         <v-flex xs6>
           <v-layout
             align-center
             justify-center
-            fill-height
           >
             <v-layout
               align-center
@@ -23,7 +22,7 @@
             </v-layout>
           </v-layout>
         </v-flex>
-        <v-flex xs6>
+        <v-flex>
           <TilesetPicker />
         </v-flex>
       </v-layout>

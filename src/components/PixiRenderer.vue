@@ -1,5 +1,14 @@
+<style>
+canvas {
+	border-radius: 4px;
+}
+</style>
+
 <template>
-  <div id="pixi_canvas" />
+  <div
+    class="pa-4"
+    id="pixi_canvas"
+  />
 </template>
 
 <script>
@@ -10,7 +19,7 @@ import { computeBitmaskWalls, sumToTile, key, unkey } from '@/assets/Utils'
 // PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
 
 const WIDTH = 800
-const HEIGHT = 800
+const HEIGHT = 600
 
 const app = new PIXI.Application({
 	width: WIDTH,

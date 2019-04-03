@@ -1,27 +1,36 @@
 <template>
-  <v-layout
-    wrap
-    fill-height
-    style="max-height: 100vh; overflow: auto;"
-  >
+  <v-layout wrap>
     <v-flex
       xs12
       md6
+      lg4
       v-for="(tileset, index) in tilesets"
       :key="index"
     >
       <v-layout justify-center>
-        <v-card class="ma-4">
-          <v-card-title class="purple darken-3">
-            <span class="title font-weight-light">{{formatFilename(tileset.name)}}</span>
-            <v-spacer />
-            <v-chip
-              small
-              color="#474747"
-              v-if="tileset === selectedTileset"
-            >
-              <span class="white--text">selected</span>
-            </v-chip>
+        <v-card
+          class="ma-4"
+          :elevation="tileset === selectedTileset ? 8 : 2"
+        >
+          <v-card-title class="orange darken-4">
+            <v-layout align-content-center>
+              <span class="title font-weight-light">{{formatFilename(tileset.name)}}</span>
+              <v-spacer />
+              <v-icon
+                small
+                v-if="tileset === selectedTileset"
+                class="pl-2"
+              >visibility</v-icon>
+
+              <!-- <span
+                style="background-color: #474747; margin: 2px; border-radius: 4px"
+                v-if="tileset === selectedTileset"
+              >
+                <small class="white--text">
+                  selected
+                </small>
+              </span> -->
+            </v-layout>
           </v-card-title>
           <v-img
             class="ma-2"
@@ -31,15 +40,18 @@
           />
           <v-card-actions>
             <v-btn
-              color="purple darken-3"
+              color="orange darken-4"
               @click.native="selectTileset(tileset)"
               :disabled="tileset === selectedTileset"
             >
-              Preview
-              <v-icon class="pl-2">visibility</v-icon>
+              Preview Tileset
             </v-btn>
             <v-spacer />
-            <v-btn flat>
+            <v-btn
+              flat
+              :href="tileset.url"
+              download
+            >
               Download
               <v-icon class="pl-2">get_app</v-icon>
             </v-btn>
