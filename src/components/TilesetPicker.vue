@@ -151,7 +151,7 @@ import { setInterval } from 'timers'
 export default {
 	name: 'TilesetPicker',
 	computed: mapState({
-		selectedTileset: state => state.selectTileset,
+		selectedTileset: state => state.selectedTileset,
 		tilesets: state => state.tilesets,
 		possibleDimensions: state => [...new Set(state.tilesets.map(({ spriteWidth, spriteHeight }) => `${spriteWidth}x${spriteHeight}`))]
 	}),
