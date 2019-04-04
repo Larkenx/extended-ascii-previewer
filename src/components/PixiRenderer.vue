@@ -25,7 +25,8 @@ const app = new PIXI.Application({
 	width: WIDTH,
 	height: HEIGHT,
 	antialias: true,
-	backgroundColor: 0x000
+	backgroundColor: 0x000,
+    forceCanvas: true
 })
 // TODO: instantiate Pixi.js app/container outside of vue data context because we don't want reactive setters/getters on pixijs components themselves; pixi internal canvas
 // rendering does not require us to track those changes (and furthermore would cause huge performance problems)
