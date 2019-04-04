@@ -1,3 +1,10 @@
+<style>
+html {
+	overflow: auto;
+}
+</style>
+
+
 <template>
   <v-app dark>
     <v-toolbar app>
@@ -7,11 +14,15 @@
       <v-spacer></v-spacer>
     </v-toolbar>
     <v-content>
-      <v-layout fill-height>
-        <v-flex xs6>
+      <v-layout
+        justify-space-between
+        fill-height
+      >
+        <v-flex>
           <v-layout
             align-center
             justify-center
+            fill-height
           >
             <v-layout
               align-center

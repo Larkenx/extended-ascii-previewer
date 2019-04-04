@@ -16,7 +16,7 @@ import * as PIXI from 'pixi.js'
 import { mapState } from 'vuex'
 import { computeBitmaskWalls, sumToTile, key, unkey } from '@/assets/Utils'
 
-// PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
+PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
 
 const WIDTH = 800
 const HEIGHT = 600
@@ -41,7 +41,6 @@ export default {
 			this.loadTilesets()
 		},
 		selectedTileset(newState, oldState) {
-			console.log('Watching a new selected tileset', this.selectedTileset)
 			if (this.loaded) this.renderMap()
 		},
 		map(newState, oldState) {
@@ -133,7 +132,9 @@ export default {
 				// Grab the width/height and name of the current tileset tiles
 				const { spriteWidth, spriteHeight, name } = this.selectedTileset
 				// Calculate scale (by width) of tiles so that it fills the screen properly
-				let scale = WIDTH / (this.map[0].length * spriteWidth)
+				let scaleX = ~~(WIDTH / (this.map[0].length * spriteWidth))
+				let scaleY = ~~(HEIGHT / (this.map.length * spriteHeight))
+				let scale = scaleX <= scaleY ? scaleX : scaleY
 				let background = new PIXI.Container()
 				for (let y = 0; y < this.map.length; y++) {
 					for (let x = 0; x < this.map[0].length; x++) {
@@ -156,7 +157,7 @@ export default {
 				}
 				app.stage.addChild(staticBackground)
 				app.stage.addChild(title)
-				// app.stage.scale.x = app.stage.scale.y = scale
+				app.stage.scale.x = app.stage.scale.y = scale
 			}
 		}
 	}
