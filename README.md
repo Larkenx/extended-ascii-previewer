@@ -6,6 +6,8 @@ When creating a roguelike or text-graphics game, one of the most important parts
 
 ![screenshot](public/images/screenshot.png)
 
+### Features
+With this application, you can select different tilesets and dynamically reload the currently generated map on the left. You can also select from several different map generation techniques and rerender the map. You can toggle on/off the bitmasking of the wall tiles as well.
 
 ## Project setup
 ```
