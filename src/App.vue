@@ -110,8 +110,8 @@ import PixiRenderer from './components/PixiRenderer'
 import { SELECT_TILESET, LOAD_TILESETS, LOAD_MAP } from '@/store'
 import { computeBitmaskWalls, sumToTile, key, unkey } from '@/assets/Utils'
 
-const width = 40
-const height = 40
+const width = 50
+const height = 50
 
 export default {
 	name: 'App',
@@ -141,6 +141,7 @@ export default {
 		},
 		generateMap() {
 			let map = null
+			let flipWalls = false
 			if (this.selectedMapGenerationTechnique.includes('Digger')) {
 				map = new ROT.Map.Digger(width, height)
 			} else if (this.selectedMapGenerationTechnique.includes('Uniform')) {
@@ -149,14 +150,25 @@ export default {
 				map = new ROT.Map.Rogue(width, height)
 			} else if (this.selectedMapGenerationTechnique.includes('Cellular')) {
 				map = new ROT.Map.Cellular(width, height)
-			} else if (this.selectedMapGenerationTechnique.includes('Maze')) {
+				map.randomize(0.5)
+				flipWalls = true
+				for (let i = 0; i < 4; i++) map.create()
+				map.connect()
+			} else if (this.selectedMapGenerationTechnique.includes('Divided Maze')) {
 				map = new ROT.Map.DividedMaze(width, height)
+			} else if (this.selectedMapGenerationTechnique.includes("Icey's")) {
+				map = new ROT.Map.IceyMaze(width, height)
+			} else if (this.selectedMapGenerationTechnique.includes("Eller's Perfect")) {
+				map = new ROT.Map.EllerMaze(width, height)
 			} else {
 				map = new ROT.Map.Rogue(width, height)
 			}
 			this.blockedCells = {}
 			let mapGeneratorCallback = (x, y, blocked) => {
 				this.blockedCells[key(x, y)] = blocked || x >= width || y >= height
+				if (flipWalls) {
+					this.blockedCells[key(x, y)] = !this.blockedCells[key(x, y)]
+				}
 			}
 			map.create(mapGeneratorCallback)
 			this.createMapFromBlockedCells()
@@ -196,7 +208,15 @@ export default {
 		return {
 			blockedCells: {},
 			shouldBitmask: true,
-			possibleMapGenerationTechniques: ['Uniform Dungeon', 'Digger Dungeon', 'Rogue Dungeon', 'Cellular', 'Maze'],
+			possibleMapGenerationTechniques: [
+				'Uniform Dungeon',
+				'Digger Dungeon',
+				'Rogue Dungeon',
+				'Cellular Automata',
+				'Divided Maze',
+				"Eller's Perfect Maze",
+				"Icey's Maze"
+			],
 			selectedMapGenerationTechnique: 'Uniform Dungeon',
 			selectedColorTheme: 'Black and White',
 			possibleColorThemes: ['Black and White']

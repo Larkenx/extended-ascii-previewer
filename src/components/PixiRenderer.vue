@@ -55,6 +55,7 @@ export default {
 		mountCanvas() {
 			document.getElementById('pixi_canvas').innerHTML = ''
 			document.getElementById('pixi_canvas').appendChild(app.view)
+			PIXI.loader.reset()
 		},
 		loadTilesets() {
 			if (this.tilesets && !this.loaded) {
