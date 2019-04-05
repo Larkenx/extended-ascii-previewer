@@ -1,6 +1,7 @@
 <style>
 html {
 	overflow: auto;
+	background-color: #303030;
 }
 </style>
 
@@ -14,66 +15,63 @@ html {
       <v-spacer></v-spacer>
     </v-toolbar>
     <v-content>
-      <v-layout justify-space-around fill-height>
+      <v-layout
+        justify-space-between
+        fill-height
+      >
         <v-flex>
-          <v-layout fill-height column>
+          <v-layout
+            fill-height
+            column
+            wrap
+          >
             <!-- The Game View -->
-            <v-layout justify-start column>
-              <PixiRenderer/>
+            <v-layout
+              justify-start
+              column
+            >
+              <PixiRenderer />
             </v-layout>
           </v-layout>
         </v-flex>
         <v-flex>
           <v-flex grow>
-            <v-layout fill-height wrap>
-              <v-flex>
-                <v-layout justify-start fill-height column>
-                  <v-card flat class="ma-2">
-                    <v-card-title class="grey darken-4">
-                      <span class="title">Map Generation</span>
-                    </v-card-title>
-                    <v-card-text>
-                      <v-form>
-                        <v-container class="pa-0 ma-0">
-                          <v-layout justify-space-between align-center align-content-center>
-                            <v-flex>
-                              <v-select
-                                color="deep-orange darken-4"
-                                v-model="selectedMapGenerationTechnique"
-                                :items="possibleMapGenerationTechniques"
-                                label="Map Generation Type"
-                              />
-                            </v-flex>
-                            <v-flex>
-                              <v-switch
-                                color="deep-orange darken-4"
-                                v-model="shouldBitmask"
-                                label="Bitmask Walls"
-                              />
-                            </v-flex>
-                            <v-flex>
-                              <v-btn
-                                @click.native="generateMap()"
-                                color="deep-orange darken-4"
-                              >Generate Map</v-btn>
-                            </v-flex>
-                          </v-layout>
-                        </v-container>
-                      </v-form>
-                    </v-card-text>
-                  </v-card>
-                </v-layout>
+            <v-layout
+              fill-height
+              wrap
+            >
+              <!-- Map Generation Card -->
+              <v-flex
+                md12
+                lg6
+              >
+                <MapGenerationPicker @generateMap="generateMap()" />
               </v-flex>
-              <v-flex>
-                <v-layout justify-start fill-height column>
-                  <v-card flat class="ma-2">
+              <!-- Color Theme Card -->
+              <v-flex
+                md12
+                lg6
+              >
+                <v-layout
+                  justify-start
+                  fill-height
+                  column
+                >
+                  <v-card
+                    flat
+                    class="ma-2"
+                  >
                     <v-card-title class="grey darken-4">
                       <span class="title">Color Themes</span>
                     </v-card-title>
                     <v-card-text>
                       <v-form>
                         <v-container class="pa-0 ma-0">
-                          <v-layout justify-center align-center align-content-center>
+                          <v-layout
+                            justify-center
+                            align-center
+                            align-content-center
+                          >
                             <v-flex>
                               <v-select
                                 color="deep-orange darken-4"
@@ -94,7 +92,7 @@ html {
               </v-flex>
             </v-layout>
           </v-flex>
-          <TilesetPicker/>
+          <TilesetPicker />
         </v-flex>
       </v-layout>
     </v-content>
@@ -105,8 +103,9 @@ html {
 import axios from 'axios'
 import ROT from 'rot-js'
 import { mapState, mapMutations } from 'vuex'
-import TilesetPicker from './components/TilesetPicker'
-import PixiRenderer from './components/PixiRenderer'
+import TilesetPicker from '@/components/TilesetPicker'
+import PixiRenderer from '@/components/PixiRenderer'
+import MapGenerationPicker from '@/components/MapGenerationPicker'
 import { SELECT_TILESET, LOAD_TILESETS, LOAD_MAP } from '@/store'
 import { computeBitmaskWalls, sumToTile, key, unkey } from '@/assets/Utils'
 
@@ -117,9 +116,10 @@ export default {
 	name: 'App',
 	components: {
 		TilesetPicker,
-		PixiRenderer
+		PixiRenderer,
+		MapGenerationPicker
 	},
-	computed: mapState(['tilesets', 'selectedTileset', 'map']),
+	computed: mapState(['tilesets', 'selectedTileset', 'map', 'selectedMapGenerationTechnique', 'shouldBitmask']),
 	watch: {
 		shouldBitmask(newState, oldState) {
 			this.createMapFromBlockedCells()
@@ -207,17 +207,6 @@ export default {
 	data() {
 		return {
 			blockedCells: {},
-			shouldBitmask: true,
-			possibleMapGenerationTechniques: [
-				'Uniform Dungeon',
-				'Digger Dungeon',
-				'Rogue Dungeon',
-				'Cellular Automata',
-				'Divided Maze',
-				"Eller's Perfect Maze",
-				"Icey's Maze"
-			],
-			selectedMapGenerationTechnique: 'Uniform Dungeon',
 			selectedColorTheme: 'Black and White',
 			possibleColorThemes: ['Black and White']
 		}

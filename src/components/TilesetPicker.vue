@@ -1,16 +1,34 @@
 <template>
-  <v-layout justify-start column>
-    <v-card flat class="ma-2">
+  <v-layout
+    justify-start
+    column
+  >
+    <v-card
+      flat
+      class="ma-2"
+    >
       <v-card-title class="grey darken-4">
         <span class="title">Tileset Picker</span>
       </v-card-title>
 
       <!-- Card Title & Search Controls  -->
       <v-card-text class="pa-2">
-        <v-layout wrap justify-space-between>
+        <v-layout
+          wrap
+          justify-space-between
+        >
           <v-flex xs12>
-            <v-layout justify-center align-end align-content-end wrap>
-              <v-flex xs12 lg4 class="pa-1">
+            <v-layout
+              justify-center
+              align-end
+              align-content-end
+              wrap
+            >
+              <v-flex
+                xs12
+                lg6
+                class="pa-1"
+              >
                 <v-text-field
                   color="deep-orange darken-4"
                   label="Search"
@@ -18,7 +36,24 @@
                   v-model="searchName"
                 />
               </v-flex>
-              <v-flex xs12 lg4 class="pa-1">
+              <!-- <v-flex
+                xs6
+                lg4
+                class="pa-1"
+              >
+                <v-switch
+                  class="ml-4 mb-4"
+                  color="deep-orange darken-4"
+                  v-model="squareRatioOnly"
+                  hint="Square Fonts Only"
+                  persistent-hint
+                />
+              </v-flex> -->
+              <v-flex
+                xs12
+                lg6
+                class="pa-1"
+              >
                 <v-select
                   color="deep-orange darken-4"
                   v-model="selectedDimensions"
@@ -29,34 +64,42 @@
                   clearable
                 ></v-select>
               </v-flex>
-              <v-flex xs12 lg4 class="pa-1">
-                <v-switch
-                  class="ml-4 mb-4"
-                  color="deep-orange darken-4"
-                  v-model="squareRatioOnly"
-                  label="Show only square ratio fonts"
-                />
-              </v-flex>
+
             </v-layout>
           </v-flex>
           <!--  List of Tilesets -->
           <v-flex xs12>
-            <v-layout wrap style="overflow-y: scroll; max-height: 600px; min-height: 600px;">
-              <v-flex v-for="(tileset, index) in filterVisibleTilests(tilesets)" :key="index">
+            <v-layout
+              wrap
+              style="overflow-y: scroll; max-height: 480px; min-height: 480px;"
+            >
+              <v-flex
+                v-for="(tileset, index) in filterVisibleTilests(tilesets)"
+                :key="index"
+              >
                 <v-layout justify-center>
                   <v-card
                     color="grey darken-4"
                     class="ma-1"
-                    :elevation="tileset === selectedTileset ? 8 : 2"
+                    :elevation="tileset === selectedTileset ? 12 : 2"
                   >
                     <v-card-title class="deep-orange darken-4">
                       <v-layout align-content-center>
                         <span class="title font-weight-light">{{formatFilename(tileset.name)}}</span>
-                        <v-spacer/>
-                        <v-icon small v-if="tileset === selectedTileset" class="pl-2">visibility</v-icon>
+                        <v-spacer />
+                        <v-icon
+                          small
+                          v-if="tileset === selectedTileset"
+                          class="pl-2"
+                        >visibility</v-icon>
                       </v-layout>
                     </v-card-title>
-                    <v-img class="ma-2" :src="tileset.url" :height="275" :width="275"/>
+                    <v-img
+                      class="ma-2"
+                      :src="tileset.url"
+                      :height="275"
+                      :width="275"
+                    />
                     <v-card-actions>
                       <v-btn
                         small
@@ -64,8 +107,13 @@
                         @click.native="selectTileset(tileset)"
                         :disabled="tileset === selectedTileset"
                       >Preview Tileset</v-btn>
-                      <v-spacer/>
-                      <v-btn flat small :href="tileset.url" download>
+                      <v-spacer />
+                      <v-btn
+                        flat
+                        small
+                        :href="tileset.url"
+                        download
+                      >
                         Download
                         <v-icon class="pl-2">get_app</v-icon>
                       </v-btn>
@@ -79,7 +127,10 @@
       </v-card-text>
       <v-card-actions>
         <v-layout fill-height>
-          <v-layout column justify-end>
+          <v-layout
+            column
+            justify-end
+          >
             <small>Showing {{filterVisibleTilests(tilesets).length}} of {{tilesets.length}} tilesets</small>
           </v-layout>
         </v-layout>
