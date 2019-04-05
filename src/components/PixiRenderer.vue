@@ -40,7 +40,6 @@ export default {
 		},
 		selectedTileset(newState, oldState) {
 			if (this.loaded) this.renderMap()
-			if (this.loaded) console.log(this.textureMap[newState.name])
 		},
 		map(newState, oldState) {
 			if (this.loaded) this.renderMap()
@@ -58,7 +57,7 @@ export default {
 			document.getElementById('pixi_canvas').appendChild(app.view)
 		},
 		loadTilesets() {
-			if (this.tilesets) {
+			if (this.tilesets && !this.loaded) {
 				PIXI.loader
 					.add(this.tilesets)
 					.on('progress', (loader, resource) => this.handleAssetLoad(loader, resource))

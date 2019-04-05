@@ -45,6 +45,13 @@ html {
                               />
                             </v-flex>
                             <v-flex>
+                              <v-switch
+                                color="deep-orange darken-4"
+                                v-model="shouldBitmask"
+                                label="Bitmask Walls"
+                              />
+                            </v-flex>
+                            <v-flex>
                               <v-btn
                                 @click.native="generateMap()"
                                 color="deep-orange darken-4"
@@ -112,7 +119,12 @@ export default {
 		TilesetPicker,
 		PixiRenderer
 	},
-	computed: mapState(['tilesets']),
+	computed: mapState(['tilesets', 'selectedTileset', 'map']),
+	watch: {
+		shouldBitmask(newState, oldState) {
+			this.createMapFromBlockedCells()
+		}
+	},
 	methods: {
 		...mapMutations({
 			loadTilesets: LOAD_TILESETS,
@@ -120,8 +132,12 @@ export default {
 			loadMap: LOAD_MAP
 		}),
 		getCharacter(x, y, map) {
-			if (map[key(x, y)]) return sumToTile(computeBitmaskWalls(x, y, map))
-			else if (!map[key(x, y)]) return '.'
+			if (map[key(x, y)]) {
+				if (this.shouldBitmask) {
+					return sumToTile(computeBitmaskWalls(x, y, map))
+				}
+				return '#'
+			} else if (!map[key(x, y)]) return '.'
 		},
 		generateMap() {
 			let map = null
@@ -131,26 +147,33 @@ export default {
 				map = new ROT.Map.Uniform(width, height)
 			} else if (this.selectedMapGenerationTechnique.includes('Rogue')) {
 				map = new ROT.Map.Rogue(width, height)
+			} else if (this.selectedMapGenerationTechnique.includes('Cellular')) {
+				map = new ROT.Map.Cellular(width, height)
+			} else if (this.selectedMapGenerationTechnique.includes('Maze')) {
+				map = new ROT.Map.DividedMaze(width, height)
 			} else {
-				map = new ROT.Map.Uniform(width, height)
+				map = new ROT.Map.Rogue(width, height)
 			}
-			let blockedCells = {}
+			this.blockedCells = {}
 			let mapGeneratorCallback = (x, y, blocked) => {
-				blockedCells[key(x, y)] = blocked || x >= width || y >= height
+				this.blockedCells[key(x, y)] = blocked || x >= width || y >= height
 			}
 			map.create(mapGeneratorCallback)
+			this.createMapFromBlockedCells()
+		},
+		createMapFromBlockedCells() {
 			let result = []
 			let playerPlaced = false
 			for (let y = 0; y < height; y++) {
 				result.push([])
 				for (let x = 0; x < width; x++) {
-					const blocked = blockedCells[key(x, y)]
+					const blocked = this.blockedCells[key(x, y)]
 					if (!blocked && !playerPlaced) {
 						result[y].push('@')
 						playerPlaced = true
 						continue
 					}
-					result[y].push(this.getCharacter(x, y, blockedCells))
+					result[y].push(this.getCharacter(x, y, this.blockedCells))
 				}
 			}
 			this.loadMap(result)
@@ -171,7 +194,9 @@ export default {
 	},
 	data() {
 		return {
-			possibleMapGenerationTechniques: ['Uniform Dungeon', 'Digger Dungeon', 'Rogue Dungeon'],
+			blockedCells: {},
+			shouldBitmask: true,
+			possibleMapGenerationTechniques: ['Uniform Dungeon', 'Digger Dungeon', 'Rogue Dungeon', 'Cellular', 'Maze'],
 			selectedMapGenerationTechnique: 'Uniform Dungeon',
 			selectedColorTheme: 'Black and White',
 			possibleColorThemes: ['Black and White']
