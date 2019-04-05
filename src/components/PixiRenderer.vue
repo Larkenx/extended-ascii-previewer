@@ -5,10 +5,7 @@ canvas {
 </style>
 
 <template>
-  <div
-    class="pa-4"
-    id="pixi_canvas"
-  />
+  <div class="ma-2" id="pixi_canvas"/>
 </template>
 
 <script>
@@ -19,14 +16,14 @@ import { computeBitmaskWalls, sumToTile, key, unkey } from '@/assets/Utils'
 PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
 
 const WIDTH = 800
-const HEIGHT = 600
+const HEIGHT = 800
 
 const app = new PIXI.Application({
 	width: WIDTH,
 	height: HEIGHT,
 	antialias: true,
 	backgroundColor: 0x000,
-    forceCanvas: true
+	forceCanvas: true
 })
 // TODO: instantiate Pixi.js app/container outside of vue data context because we don't want reactive setters/getters on pixijs components themselves; pixi internal canvas
 // rendering does not require us to track those changes (and furthermore would cause huge performance problems)
@@ -43,6 +40,7 @@ export default {
 		},
 		selectedTileset(newState, oldState) {
 			if (this.loaded) this.renderMap()
+			if (this.loaded) console.log(this.textureMap[newState.name])
 		},
 		map(newState, oldState) {
 			if (this.loaded) this.renderMap()
@@ -115,19 +113,8 @@ export default {
 				}
 			}
 		},
-		getCharacter(x, y, map) {
-			if (map[key(x, y)]) return sumToTile(computeBitmaskWalls(x, y, map))
-			else if (!map[key(x, y)]) return '.'
-		},
 		renderMap() {
 			if (this.selectedTileset && this.map) {
-				/* Generate a hashmap of coordinate keys that tell us which coords are walls, and which are floors */
-				let blockedCells = {}
-				for (let y = 0; y < this.map.length; y++) {
-					for (let x = 0; x < this.map[0].length; x++) {
-						blockedCells[key(x, y)] = this.map[y][x] === '#'
-					}
-				}
 				// Clear the screen
 				this.clear()
 				// Grab the width/height and name of the current tileset tiles
@@ -139,7 +126,7 @@ export default {
 				let background = new PIXI.Container()
 				for (let y = 0; y < this.map.length; y++) {
 					for (let x = 0; x < this.map[0].length; x++) {
-						const character = this.map[y][x] === '#' ? this.getCharacter(x, y, blockedCells) : this.map[y][x]
+						const character = this.map[y][x]
 						const texture = this.textureMap[name][character]
 						let sprite = new PIXI.Sprite(texture)
 						sprite.position.set(x * spriteWidth, y * spriteHeight)
@@ -147,7 +134,7 @@ export default {
 					}
 				}
 				let staticBackground = new PIXI.Sprite(app.renderer.generateTexture(background))
-				staticBackground.position.set(0, 1)
+				staticBackground.position.set(0, spriteHeight)
 				let title = new PIXI.Container()
 				const titleCharacters = name.split('')
 				for (let x = 0; x < titleCharacters.length; x++) {
