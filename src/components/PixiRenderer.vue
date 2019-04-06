@@ -21,13 +21,13 @@ PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
 const WIDTH = 800
 const HEIGHT = 800
 
-const app = new PIXI.Application({
-	width: WIDTH,
-	height: HEIGHT,
-	antialias: true,
-	backgroundColor: 0x000,
-	forceCanvas: true
+const renderer = new PIXI.autoDetectRenderer(WIDTH, HEIGHT, {
+	antialiasing: false,
+	transparent: false
 })
+
+let stage = new PIXI.Container()
+
 // TODO: instantiate Pixi.js app/container outside of vue data context because we don't want reactive setters/getters on pixijs components themselves; pixi internal canvas
 // rendering does not require us to track those changes (and furthermore would cause huge performance problems)
 export default {
@@ -36,7 +36,7 @@ export default {
 		// When we mount this component, we want to register Pixi with a new HTML5 canvas...
 		this.mountCanvas()
 	},
-	computed: mapState(['selectedTileset', 'tilesets', 'map']),
+	computed: mapState(['selectedTileset', 'selectedColors', 'tilesets', 'map']),
 	watch: {
 		tilesets(newState, oldState) {
 			this.loadTilesets()
@@ -57,7 +57,7 @@ export default {
 	methods: {
 		mountCanvas() {
 			document.getElementById('pixi_canvas').innerHTML = ''
-			document.getElementById('pixi_canvas').appendChild(app.view)
+			document.getElementById('pixi_canvas').appendChild(renderer.view)
 			PIXI.loader.reset()
 		},
 		loadTilesets() {
@@ -74,14 +74,13 @@ export default {
 			}
 		},
 		clear() {
-			app.stage.removeChildren()
+			stage.removeChildren()
 		},
 		handleAssetLoad(loader, resource) {
-			let { stage, renderer } = app
 			this.clear()
 			// let graphics = new PIXI.Graphics()
-			let cx = stage.width / 2
-			let cy = stage.height / 2
+			let cx = 0
+			let cy = 0
 			// let barLength = renderer.width / 2
 			let text = new PIXI.Text(`Loading ${resource.name}... ${Math.floor(loader.progress)}%`, {
 				fill: 0xffffff,
@@ -120,6 +119,13 @@ export default {
 			if (this.selectedTileset && this.map) {
 				// Clear the screen
 				this.clear()
+				if (this.selectedColors && this.selectedColors.Background) {
+					let g = new PIXI.Graphics()
+					g.beginFill(this.selectedColors.Background.replace('#', '0x').toString(16))
+					g.drawRect(0, 0, WIDTH, HEIGHT)
+					stage.addChild(g)
+					renderer.render(stage)
+				}
 				// Grab the width/height and name of the current tileset tiles
 				const { spriteWidth, spriteHeight, name } = this.selectedTileset
 				// Calculate scale (by width) of tiles so that it fills the screen properly
@@ -137,8 +143,7 @@ export default {
 						background.addChild(sprite)
 					}
 				}
-				let staticBackground = new PIXI.Sprite(app.renderer.generateTexture(background))
-				staticBackground.position.set(0, spriteHeight)
+
 				let title = new PIXI.Container()
 				const titleCharacters = name.split('')
 				for (let x = 0; x < titleCharacters.length; x++) {
@@ -147,9 +152,14 @@ export default {
 					sprite.position.set(x * spriteWidth, 0)
 					title.addChild(sprite)
 				}
-				app.stage.addChild(staticBackground)
-				app.stage.addChild(title)
-				app.stage.scale.x = app.stage.scale.y = scale
+				stage.scale.x = stage.scale.y = scale
+				// let staticBackground = new PIXI.Sprite(renderer.generateTexture(background))
+				// staticBackground.position.set(0, spriteHeight)
+				stage.addChild(title)
+				// stage.addChild(staticBackground)
+				background.position.set(0, spriteHeight)
+				stage.addChild(background)
+				renderer.render(stage)
 			}
 		}
 	}

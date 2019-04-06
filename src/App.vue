@@ -52,43 +52,7 @@ html {
                 md12
                 lg6
               >
-                <v-layout
-                  justify-start
-                  fill-height
-                  column
-                >
-                  <v-card
-                    flat
-                    class="ma-2"
-                  >
-                    <v-card-title class="grey darken-4">
-                      <span class="title">Color Themes</span>
-                    </v-card-title>
-                    <v-card-text>
-                      <v-form>
-                        <v-container class="pa-0 ma-0">
-                          <v-layout
-                            justify-center
-                            align-center
-                            align-content-center
-                          >
-                            <v-flex>
-                              <v-select
-                                color="deep-orange darken-4"
-                                v-model="selectedColorTheme"
-                                :items="possibleColorThemes"
-                                label="Color Themes (Reloads on selection)"
-                              />
-                            </v-flex>
-                            <!-- <v-flex>
-                              <v-btn color="deep-orange darken-4">Generate Map</v-btn>
-                            </v-flex>-->
-                          </v-layout>
-                        </v-container>
-                      </v-form>
-                    </v-card-text>
-                  </v-card>
-                </v-layout>
+                <ColorThemePicker />
               </v-flex>
             </v-layout>
           </v-flex>
@@ -106,7 +70,8 @@ import { mapState, mapMutations } from 'vuex'
 import TilesetPicker from '@/components/TilesetPicker'
 import PixiRenderer from '@/components/PixiRenderer'
 import MapGenerationPicker from '@/components/MapGenerationPicker'
-import { SELECT_TILESET, LOAD_TILESETS, LOAD_MAP } from '@/store'
+import ColorThemePicker from '@/components/ColorThemePicker'
+import { SELECT_TILESET, SELECT_THEME, LOAD_TILESETS, LOAD_MAP, LOAD_THEMES } from '@/store'
 import { computeBitmaskWalls, sumToTile, key, unkey } from '@/assets/Utils'
 
 const width = 50
@@ -125,19 +90,25 @@ export default {
 	components: {
 		TilesetPicker,
 		PixiRenderer,
-		MapGenerationPicker
+		MapGenerationPicker,
+		ColorThemePicker
 	},
-	computed: mapState(['tilesets', 'selectedTileset', 'map', 'selectedMapGenerationTechnique', 'shouldBitmask']),
+	computed: mapState(['tilesets', 'map', 'selectedTileset', 'selectedMapGenerationTechnique', 'selectedColors', 'shouldBitmask']),
 	watch: {
 		shouldBitmask(newState, oldState) {
+			this.createMapFromBlockedCells()
+		},
+		selectedColors(newState, oldState) {
 			this.createMapFromBlockedCells()
 		}
 	},
 	methods: {
 		...mapMutations({
 			loadTilesets: LOAD_TILESETS,
+			loadMap: LOAD_MAP,
+			loadThemes: LOAD_THEMES,
 			selectTileset: SELECT_TILESET,
-			loadMap: LOAD_MAP
+			selectTheme: SELECT_THEME
 		}),
 		getCharacter(x, y, map) {
 			if (map[key(x, y)]) {
@@ -182,6 +153,27 @@ export default {
 			this.createMapFromBlockedCells()
 		},
 		createMapFromBlockedCells() {
+			let colors = {
+				Black: '#090200',
+				Blue: '#00a0e4',
+				BrightBlack: '#5b5754',
+				BrightBlue: '#7f7c7b',
+				BrightCyan: '#ccab53',
+				BrightGreen: '#3a3332',
+				BrightMagenta: '#d6d4d3',
+				BrightRed: '#e8bacf',
+				BrightWhite: '#f7f7f7',
+				BrightYellow: '#494542',
+				Cyan: '#b5e4f4',
+				Green: '#00a152',
+				Magenta: '#a06994',
+				Red: '#da2c20',
+				White: '#a4a1a1',
+				Yellow: '#fcec02'
+			}
+			if (this.selectedColors) {
+				colors = { ...this.selectedColors }
+			}
 			let result = []
 			let playerPlaced = false
 			for (let y = 0; y < height; y++) {
@@ -189,24 +181,28 @@ export default {
 				for (let x = 0; x < width; x++) {
 					const blocked = this.blockedCells[key(x, y)]
 					if (!blocked && !playerPlaced) {
-						result[y].push(new Glyph('@', '#7FB069'))
+						result[y].push(new Glyph('@', colors.Yellow))
 						playerPlaced = true
 						continue
 					}
 
-					result[y].push(new Glyph(this.getCharacter(x, y, this.blockedCells), blocked ? '#D36135' : '#ECE4B7'))
+					result[y].push(new Glyph(this.getCharacter(x, y, this.blockedCells), blocked ? colors.BrightWhite : colors.Red))
 				}
 			}
 			this.loadMap(result)
 		}
 	},
 	created() {
-		const tilesetApi = window.origin.includes('localhost') ? 'http://localhost:5000' : window.origin
+		const api = window.origin.includes('localhost') ? 'http://localhost:5000' : window.origin
 		axios
-			.get(tilesetApi + '/tilesets')
+			.get(api + '/themes-and-tilesets')
 			.then(response => {
 				this.loadTilesets(response.data.tilesets)
-				this.selectTileset(response.data.tilesets[0])
+				this.loadThemes(response.data.themes)
+				this.selectTileset(response.data.tilesets.filter(ts => ts.name.includes('16x16-sb-ascii'))[0])
+				// this.selectTheme(response.data.themes[0].name)
+				this.selectTheme('Afterglow')
+
 				this.generateMap()
 			})
 			.catch(error => {

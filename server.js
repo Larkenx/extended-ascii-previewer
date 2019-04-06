@@ -44,7 +44,7 @@ function cacheColorThemes() {
 			let properties = plist.parse(fs.readFileSync(path.resolve(colorThemeDirectory, file), 'utf8'))
 			let theme = { name: properties.name }
 			for (let property in properties) {
-				if (property.startsWith('ANSI') && property.includes('Color')) {
+				if ((property.startsWith('ANSI') || property.startsWith('Background')) && property.includes('Color')) {
 					let formattedColor = property.replace('ANSI', '').replace('Color', '')
 					let regexp = /\d(?:\.?\d+)? \d(?:\.?\d+)? \d(?:\.?\d+)?/
 					let parsedBase64Buffer = properties[property].toString()
@@ -53,10 +53,8 @@ function cacheColorThemes() {
 						let colors = matches[0].split(' ')
 						if (colors.length === 3) {
 							let hex = colors
-								.map(c => parseFloat(c))
-								.map(c => ~~(c * 255))
 								.map(c => {
-									let hex = c.toString(16)
+									let hex = (~~(parseFloat(c) * 255)).toString(16)
 									if (hex.length < 2) hex = '0' + hex
 									return hex
 								})
@@ -96,8 +94,16 @@ app.get('/tilesets', (request, response) => {
 	})
 })
 
-app.get('/colorThemes', (request, response) => {
+app.get('/color-themes', (request, response) => {
 	response.send({
+		themes: storedColorThemes
+	})
+})
+
+app.get('/themes-and-tilesets', (request, response) => {
+	response.send({
+		tilesetPath: relativePath,
+		tilesets: storedTilesets,
 		themes: storedColorThemes
 	})
 })
