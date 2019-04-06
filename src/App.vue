@@ -112,6 +112,14 @@ import { computeBitmaskWalls, sumToTile, key, unkey } from '@/assets/Utils'
 const width = 50
 const height = 50
 
+class Glyph {
+	constructor(character, fg = '#ffffff', bg = 'transparent') {
+		this.character = character
+		this.fg = fg.replace('#', '0x').toString(16)
+		this.bg = bg
+	}
+}
+
 export default {
 	name: 'App',
 	components: {
@@ -181,11 +189,12 @@ export default {
 				for (let x = 0; x < width; x++) {
 					const blocked = this.blockedCells[key(x, y)]
 					if (!blocked && !playerPlaced) {
-						result[y].push('@')
+						result[y].push(new Glyph('@', '#7FB069'))
 						playerPlaced = true
 						continue
 					}
-					result[y].push(this.getCharacter(x, y, this.blockedCells))
+
+					result[y].push(new Glyph(this.getCharacter(x, y, this.blockedCells), blocked ? '#D36135' : '#ECE4B7'))
 				}
 			}
 			this.loadMap(result)

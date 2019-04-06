@@ -14,6 +14,7 @@
     "express": "^4.16.4",
     "image-size": "^0.7.2",
     "pixi.js": "^4.8.7",
+    "plist": "^3.0.1",
     "poisson-disk-sampling": "^1.0.2",
     "prng-parkmiller-js": "^0.1.1",
     "rot-js": "^0.6.5",

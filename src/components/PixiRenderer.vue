@@ -5,7 +5,10 @@ canvas {
 </style>
 
 <template>
-  <div class="ma-2" id="pixi_canvas"/>
+  <div
+    class="ma-2"
+    id="pixi_canvas"
+  />
 </template>
 
 <script>
@@ -126,9 +129,10 @@ export default {
 				let background = new PIXI.Container()
 				for (let y = 0; y < this.map.length; y++) {
 					for (let x = 0; x < this.map[0].length; x++) {
-						const character = this.map[y][x]
+						const { character, fg, bg } = this.map[y][x]
 						const texture = this.textureMap[name][character]
 						let sprite = new PIXI.Sprite(texture)
+						sprite.tint = fg
 						sprite.position.set(x * spriteWidth, y * spriteHeight)
 						background.addChild(sprite)
 					}

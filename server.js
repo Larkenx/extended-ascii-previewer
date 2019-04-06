@@ -3,10 +3,13 @@ let os = require('os')
 let fs = require('fs')
 let path = require('path')
 let getImageSize = require('image-size')
+let plist = require('plist')
 
 const relativePath = 'images/tilesets/transparent'
 const tilesetDirectory = path.resolve(__dirname, `public/${relativePath}`)
+const colorThemeDirectory = path.resolve(__dirname, `public/themes`)
 let storedTilesets = []
+let storedColorThemes = []
 
 function cacheTilesetsByDimension() {
 	// ASCII IBM CODE PAGE 437 is always 16x16
@@ -33,8 +36,49 @@ function cacheTilesetsByDimension() {
 	}
 }
 
-cacheTilesetsByDimension()
+function cacheColorThemes() {
+	// Loop through all of the OSX term themes, and load them as JSON
+	try {
+		const files = fs.readdirSync(colorThemeDirectory)
+		for (let file of files) {
+			let properties = plist.parse(fs.readFileSync(path.resolve(colorThemeDirectory, file), 'utf8'))
+			let theme = { name: properties.name }
+			for (let property in properties) {
+				if (property.startsWith('ANSI') && property.includes('Color')) {
+					let formattedColor = property.replace('ANSI', '').replace('Color', '')
+					let regexp = /\d(?:\.?\d+)? \d(?:\.?\d+)? \d(?:\.?\d+)?/
+					let parsedBase64Buffer = properties[property].toString()
+					let matches = parsedBase64Buffer.match(regexp)
+					if (matches && matches.length === 1) {
+						let colors = matches[0].split(' ')
+						if (colors.length === 3) {
+							let hex = colors
+								.map(c => parseFloat(c))
+								.map(c => ~~(c * 255))
+								.map(c => {
+									let hex = c.toString(16)
+									if (hex.length < 2) hex = '0' + hex
+									return hex
+								})
+								.join('')
+							theme[formattedColor] = '#' + hex
+						} else {
+							console.log(`Failed to parse ${property} for RGB - ${parsedBase64Buffer}`)
+						}
+					} else {
+						console.log(`Failed to parse ${property} for RGB - ${parsedBase64Buffer}`)
+					}
+				}
+			}
+			storedColorThemes.push(theme)
+		}
+	} catch (err) {
+		console.error(err.stack)
+	}
+}
 
+cacheTilesetsByDimension()
+cacheColorThemes()
 let app = express()
 let port = process.env.PORT || 5000
 
@@ -49,6 +93,12 @@ app.get('/tilesets', (request, response) => {
 	response.send({
 		tilesetPath: relativePath,
 		tilesets: storedTilesets
+	})
+})
+
+app.get('/colorThemes', (request, response) => {
+	response.send({
+		themes: storedColorThemes
 	})
 })
 
