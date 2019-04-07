@@ -131,15 +131,19 @@ export default {
 				// Calculate scale (by width) of tiles so that it fills the screen properly
 				let scaleX = ~~(WIDTH / (this.map[0].length * spriteWidth))
 				let scaleY = ~~(HEIGHT / (this.map.length * spriteHeight))
-				let scale = scaleX <= scaleY ? scaleX : scaleY
+				let scale = scaleX >= scaleY ? scaleX : scaleY
 				let background = new PIXI.Container()
 				for (let y = 0; y < this.map.length; y++) {
 					for (let x = 0; x < this.map[0].length; x++) {
+						// let g = new PIXI.Graphics()
+						// g.beginFill(this.selectedColors.Background.replace('#', '0x').toString(16))
+						// g.drawRect(x * spriteWidth, y * spriteHeight, spriteWidth, spriteHeight)
 						const { character, fg, bg } = this.map[y][x]
 						const texture = this.textureMap[name][character]
 						let sprite = new PIXI.Sprite(texture)
 						sprite.tint = fg
 						sprite.position.set(x * spriteWidth, y * spriteHeight)
+						// background.addChild(g)
 						background.addChild(sprite)
 					}
 				}
@@ -152,7 +156,7 @@ export default {
 					sprite.position.set(x * spriteWidth, 0)
 					title.addChild(sprite)
 				}
-				stage.scale.x = stage.scale.y = scale
+				// stage.scale.x = stage.scale.y = scale
 				// let staticBackground = new PIXI.Sprite(renderer.generateTexture(background))
 				// staticBackground.position.set(0, spriteHeight)
 				stage.addChild(title)
