@@ -129,9 +129,11 @@ export default {
 				// Grab the width/height and name of the current tileset tiles
 				const { spriteWidth, spriteHeight, name } = this.selectedTileset
 				// Calculate scale (by width) of tiles so that it fills the screen properly
-				let scaleX = ~~(WIDTH / (this.map[0].length * spriteWidth))
-				let scaleY = ~~(HEIGHT / (this.map.length * spriteHeight))
-				let scale = scaleX >= scaleY ? scaleX : scaleY
+				let scaleX = WIDTH / (this.map[0].length * spriteWidth)
+				// if (scaleX === 0) scaleX = ~~((this.map[0].length * spriteWidth) / WIDTH)
+				let scaleY = HEIGHT / (this.map.length * spriteHeight)
+				// if (scaleY === 0) scaleY = ~~((this.map.length * spriteHeight) / HEIGHT)
+				let scale = scaleX <= scaleY ? scaleX : scaleY
 				let background = new PIXI.Container()
 				for (let y = 0; y < this.map.length; y++) {
 					for (let x = 0; x < this.map[0].length; x++) {
@@ -156,12 +158,11 @@ export default {
 					sprite.position.set(x * spriteWidth, 0)
 					title.addChild(sprite)
 				}
-				// stage.scale.x = stage.scale.y = scale
-				// let staticBackground = new PIXI.Sprite(renderer.generateTexture(background))
-				// staticBackground.position.set(0, spriteHeight)
-				stage.addChild(title)
-				// stage.addChild(staticBackground)
 				background.position.set(0, spriteHeight)
+				// stage.scale.x = stage.scale.y = scale
+				title.scale.x = title.scale.y = background.scale.x = background.scale.y = scale
+				console.log('Scale is: ', scale)
+				stage.addChild(title)
 				stage.addChild(background)
 				renderer.render(stage)
 			}

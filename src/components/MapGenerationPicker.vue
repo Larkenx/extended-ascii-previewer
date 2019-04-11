@@ -7,6 +7,7 @@
     <v-card
       flat
       class="ma-2"
+      style="height: inherit"
     >
       <v-card-title class="grey darken-4">
         <span class="title">Map Generation</span>
@@ -16,14 +17,11 @@
           <v-container class="pa-0 ma-0">
             <v-layout
               wrap
-              justify-center
+              justify-space-between
               align-center
               align-content-center
             >
-              <v-flex
-                xs6
-                lg6
-              >
+              <v-flex xs5>
                 <v-select
                   color="deep-orange darken-4"
                   @change="state => selectMapGenerationTechnique(state)"
@@ -32,10 +30,7 @@
                   label="Map Generation Type"
                 />
               </v-flex>
-              <v-flex
-                xs6
-                lg3
-              >
+              <v-flex xs5>
                 <v-switch
                   color="deep-orange darken-4"
                   @change="(state) => toggleShouldBitmask(state)"
@@ -43,16 +38,17 @@
                   label="Bitmasking"
                 />
               </v-flex>
-              <v-flex
-                xs12
-                lg3
-              >
+              <v-flex xs12>
                 <v-layout justify-center>
                   <v-btn
-                    :block="$vuetify.breakpoint === 'xs'"
+                    small
+                    block
                     @click.native="generateMap()"
                     color="deep-orange darken-4"
-                  >Generate</v-btn>
+                    append-icon="map"
+                  >Generate
+                    <v-icon right>map</v-icon>
+                  </v-btn>
                 </v-layout>
               </v-flex>
             </v-layout>

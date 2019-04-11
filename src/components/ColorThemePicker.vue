@@ -7,9 +7,22 @@
     <v-card
       flat
       class="ma-2"
+      style="height: inherit"
     >
       <v-card-title class="grey darken-4">
         <span class="title">Color Themes</span>
+        <v-spacer />
+        <v-tooltip top>
+          <v-btn
+            slot="activator"
+            dark
+            icon
+            @click.native="downloadTheme()"
+          >
+            <v-icon>get_app</v-icon>
+          </v-btn>
+          <span>Download this color theme</span>
+        </v-tooltip>
       </v-card-title>
       <v-card-text>
         <v-form>
@@ -32,11 +45,17 @@
               <v-flex xs6>
                 <v-layout>
                   <div
-                    v-for="(color, index) in themeColors"
+                    v-for="({color, name}, index) in themeColors"
                     :style="{backgroundColor: color, width: '20px', height: '70px'}"
                     :key="index"
                   >
-                    <!-- <v-layout
+                    <v-tooltip bottom>
+                      <v-layout
+                        fill-height
+                        slot="activator"
+                      />
+                      <span>{{name}}</span>
+                      <!-- <v-layout
                       wrap
                       align-center
                     >
@@ -50,6 +69,7 @@
                         @
                       </v-flex>
                     </v-layout> -->
+                    </v-tooltip>
                   </div>
                 </v-layout>
               </v-flex>
@@ -89,7 +109,7 @@ export default {
 			if (state.themes && state.selectedTheme) {
 				let colors = state.themes[state.selectedTheme]
 				for (let name of Object.keys(colors).sort()) {
-					result.push(colors[name])
+					result.push({ color: colors[name], name })
 				}
 			}
 			return result
@@ -101,7 +121,14 @@ export default {
 	methods: {
 		...mapMutations({
 			selectTheme: SELECT_THEME
-		})
+		}),
+		downloadTheme() {
+			let a = document.createElement('a')
+			let file = new Blob([JSON.stringify(this.themes[this.selectedTheme])], { type: 'text/json' })
+			a.href = URL.createObjectURL(file)
+			a.download = this.selectedTheme + 'Theme.json'
+			a.click()
+		}
 	},
 	data() {
 		return {

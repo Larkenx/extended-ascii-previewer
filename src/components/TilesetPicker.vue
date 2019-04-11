@@ -6,6 +6,7 @@
     <v-card
       flat
       class="ma-2"
+      style="height: inherit"
     >
       <v-card-title class="grey darken-4">
         <span class="title">Tileset Picker</span>

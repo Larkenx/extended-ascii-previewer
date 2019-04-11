@@ -5,6 +5,12 @@ export const unkey = k => {
 	return k.split(',').map(s => parseInt(s))
 }
 
+export function getRandomInt(min, max) {
+	min = Math.ceil(min)
+	max = Math.floor(max)
+	return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
 export function computeBitmaskWalls(x, y, blockedCells) {
 	let sum = 0
 	let above = `${x},${y - 1}`

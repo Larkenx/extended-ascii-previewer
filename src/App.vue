@@ -72,7 +72,7 @@ import PixiRenderer from '@/components/PixiRenderer'
 import MapGenerationPicker from '@/components/MapGenerationPicker'
 import ColorThemePicker from '@/components/ColorThemePicker'
 import { SELECT_TILESET, SELECT_THEME, LOAD_TILESETS, LOAD_MAP, LOAD_THEMES } from '@/store'
-import { computeBitmaskWalls, sumToTile, key, unkey } from '@/assets/Utils'
+import { computeBitmaskWalls, sumToTile, key, unkey, getRandomInt } from '@/assets/Utils'
 
 const width = 50
 const height = 50
@@ -174,21 +174,53 @@ export default {
 			if (this.selectedColors) {
 				colors = { ...this.selectedColors }
 			}
+			let entities = [
+				new Glyph('@', colors.Yellow),
+				new Glyph('g', colors.Green),
+				new Glyph('r', colors.Blue),
+				new Glyph('t', colors.BrightGreen),
+				new Glyph('b', colors.BrightMagenta),
+				new Glyph('$', colors.Yellow),
+				new Glyph('>', colors.BrightRed),
+				new Glyph('<', colors.BrightRed),
+				new Glyph('e', colors.Cyan),
+				new Glyph('m', colors.Magenta),
+				new Glyph('w', colors.Blue),
+				new Glyph('j', colors.BrightCyan),
+				new Glyph('!', colors.BrightMagenta),
+				new Glyph('?', colors.BrightMagenta),
+				new Glyph('[', colors.BrightGreen),
+				new Glyph(')', colors.BrightGreen),
+				new Glyph('%', colors.BrightRed)
+			]
 			let result = []
-			let playerPlaced = false
+			let freeCells = []
+			let entityPlacements = {}
+			const popRandomElement = arr => {
+				if (arr.length !== 0) {
+					let index = getRandomInt(0, arr.length - 1)
+					return arr.splice(index, 1)[0]
+				}
+			}
+
 			for (let y = 0; y < height; y++) {
 				result.push([])
 				for (let x = 0; x < width; x++) {
 					const blocked = this.blockedCells[key(x, y)]
-					if (!blocked && !playerPlaced) {
-						result[y].push(new Glyph('@', colors.Yellow))
-						playerPlaced = true
-						continue
+					if (!blocked) {
+						freeCells.push([x, y])
 					}
-
-					result[y].push(new Glyph(this.getCharacter(x, y, this.blockedCells), blocked ? colors.BrightWhite : colors.Red))
+					result[y].push(new Glyph(this.getCharacter(x, y, this.blockedCells), blocked ? colors.BrightWhite : colors.BrightBlack))
 				}
 			}
+
+			while (freeCells.length > 0 && entities.length > 0) {
+				let [x, y] = popRandomElement(freeCells)
+				let entity = popRandomElement(entities)
+				console.log(`Placing '${entity.character}' at ${x},${y}`)
+				result[y][x] = entity
+			}
+
 			this.loadMap(result)
 		}
 	},
